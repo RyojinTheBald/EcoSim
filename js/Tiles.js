@@ -19,7 +19,7 @@ function TileSet(name){
 
 				    	var tileObj;
 
-				    	if (typeof(tile[0]) == 'array')
+				    	if (typeof(tile[0]) == 'object')
 				    		tile = tile[0];
 
 				    	if (tile[0] == 'AnimatedTile'){
@@ -42,11 +42,11 @@ function TileSet(name){
 				    		tileObj = self.layers[layer][tileName] = new MultiTile(urls, tile[1] || false);
 				    	}
 
-				    	// Tile metadat present
-				    	if (typeof(tile[1]) == 'object')
-				    		tileObj.data = tile[1];
+				    	// Tile metadata present
+				    	if (typeof(t[layer][tileName][1]) == 'object' && tileObj)
+				    		tileObj.data = t[layer][tileName][1];
 
-				    	console.log(tileObj);
+				    	//console.log(tileObj);
 				    		
 				    }
 				}

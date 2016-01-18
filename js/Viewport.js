@@ -67,7 +67,7 @@ function Viewport (elm, config){
 			if (!game.tileList.hasSelected && self.enableSelect){
 				self.hasSelected = true;
 				self.selectedTile = self.mouseOverTile;
-				game.info.display(self.mouseOverTile);
+				game.info.displayCoords(self.mouseOverTile);
 			}
 
 
@@ -216,7 +216,7 @@ Viewport.prototype.draw = function(map, tileSet){
 						}
 						else
 						{
-							console.log('Tile error', tile, tileSet.layers[i]);
+							//console.log('Tile error', tile, tileSet.layers[i]);
 						}
 					}
 				}					

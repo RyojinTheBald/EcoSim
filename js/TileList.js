@@ -121,5 +121,5 @@ TileList.prototype.selectTile = function(name){
 	this.hasSelected = true;
 
 	game.viewport.hasSelected = false;
-	game.info.clear();
+	game.info.display(name, game.tileSet.layers[this.layer][name]);
 }

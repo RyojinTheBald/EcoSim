@@ -4,11 +4,30 @@ function InfoWindow(element){
 	this.element = element;
 }
 
-InfoWindow.prototype.display = function(coords){
+InfoWindow.prototype.displayCoords = function(coords){
 	this.element.innerHTML = "";
-	this.element.innerHTML += "Layer 1: " + game.map.layers[0][coords.x-1][coords.y-1] + "<br>";
-	this.element.innerHTML += "Layer 2: " + game.map.layers[1][coords.x-1][coords.y-1] + "<br>";
-	this.element.innerHTML += "Layer 3: " + game.map.layers[2][coords.x-1][coords.y-1] + "<br>";
+	for(var i = 0; i < 3; i++) {
+		var tileName = game.map.layers[i][coords.x-1][coords.y-1];
+		var tile = game.tileSet.layers[i][tileName];
+		this.element.innerHTML += "Layer "+i+": " + tileName + "<br>"
+		if (tile)
+			for (key in tile.data){
+				if (tile.data.hasOwnProperty(key))
+					this.element.innerHTML += key + ": " + tile.data[key]+ "<br>";
+			}
+	}
+}
+
+
+InfoWindow.prototype.display = function(tileName, tile){
+	this.element.innerHTML = "";
+	this.element.innerHTML += tileName + "<br>"
+	if (tile)
+		for (key in tile.data){
+			if (tile.data.hasOwnProperty(key))
+				this.element.innerHTML += key + ": " + tile.data[key]+ "<br>";
+		}
+
 }
 
 InfoWindow.prototype.clear = function(){
