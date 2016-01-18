@@ -1,0 +1,20 @@
+body {
+	background: #444;
+	text-align: center;
+	overflow: hidden;
+	cursor: default;
+}
+
+canvas {
+	background: #fff;
+	border: 1px solid black;
+}
+
+tr.selected {
+	background: #3f3;
+}
+
+table, tr, td {
+	border-collapse: collapse;
+    border-spacing: 0;
+}
