@@ -39,8 +39,10 @@ function TileSet(name){
 				    		for(var i = 0; i < tile[1].length; i++){
 				    			urls.push('./tilesets/' + self.name + '/' + layer + '/' + tile[1][i])
 				    		}
-				    		tileObj = self.layers[layer][tileName] = new MultiTile(urls, tile[1] || false);
+				    		tileObj = self.layers[layer][tileName] = new MultiTile(urls, false);
 				    	}
+
+				    	tileObj.name = tileName;
 
 				    	// Tile metadata present
 				    	if (typeof(t[layer][tileName][1]) == 'object' && tileObj)
@@ -60,7 +62,7 @@ function TileSet(name){
 /*
  *	Image sprite tile class
  */
-function SpriteTile(imgURL, color){
+function SpriteTile(imgURL){
 	this.loaded = false;
 
 	//Load tile image, handles async file loading
@@ -113,9 +115,18 @@ function MultiTile(imgURLs, loop){
 	}, this);
 }
 
-MultiTile.prototype.draw = function(context, x, y, size){
-	var t = this.tiles[this.index];
+MultiTile.prototype.draw = function(context, x, y, size, data){
+
+	var data = data || {};
+
+	var index = mod(this.index + (data.index ? data.index : 0), this.tiles.length);
+
+	var t = this.tiles[index];
 	var sz = size || game.tileSize;
+
+	if(!t)
+		console.log(this.index, index);
+
 	if(t.loaded)
 		t.draw(context, x, y, sz);
 }
@@ -123,4 +134,3 @@ MultiTile.prototype.draw = function(context, x, y, size){
 MultiTile.prototype.nextTile = function(){
 	this.index = (this.index < this.tiles.length - 1) ? (this.index + 1) : (this.loop ? 0 : this.index);
 }
-

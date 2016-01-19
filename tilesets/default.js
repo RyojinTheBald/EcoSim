@@ -3,44 +3,41 @@
 define({
 0:{
 	'Water': [[
-		'AnimatedTile',[
+		'AnimatedTile', [
 			'water1.png', 
 			'water2.png', 
 			'water3.png', 
-			'water4.png'
+			'water4.png'],
+			150
 		],
-		150
-	],
-	{
-		buildable: false
-	}
+		{
+			randomIndex: true
+		}
 	],
 	'Grass': [[
 		'MultiTile', [
 			'grass1.png',
 			'grass2.png',
 			'grass3.png',
-			'grass4.png'
-		]
-	],
-	{
-		buildable: true,
-		randomIndex: true
-	}
+			'grass4.png']
+		],
+		{
+			buildable: true,
+			randomIndex: true
+		}
 	],
 	'Hill': [[
 		'MultiTile', [
 			'mountain1.png',
 			'mountain2.png',
 			'mountain3.png',
-			'mountain4.png'
-	]],
-	{
-		buildable: false,
-		randomIndex: true
-	}
-	
-]
+			'mountain4.png']
+		],
+		{
+			buildable: false,
+			randomIndex: true
+		}
+	]
 },
 1:{
 	'Beach N': ['SpriteTile', 'water-grass-n.png'],
@@ -69,7 +66,8 @@ define({
 			'res_corn4.png'
 		]],
 		{
-			buildOn: 'Grass'
+			buildOn: 'Grass',
+			progressiveIndex: true
 		}
 	],
 	'Potato Field': [[
@@ -79,7 +77,8 @@ define({
 			'res_potato3.png'
 		]],
 		{
-			buildOn: 'Grass'
+			buildOn: 'Grass',
+			progressiveIndex: true
 		}
 	],
 	'Tree': [[

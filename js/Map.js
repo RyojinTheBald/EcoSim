@@ -3,14 +3,30 @@
  *	Map definition
  */
 function Map(data) {
+	this.compressSave = true;
 	this.loaded = true;
 	this.width = 0;
 	this.height = 0;
 	this.layers = new Array();
-	this.layers.push(new Layer(this.width, this.height));
 
-	if (typeof(data) != 'undefined')
-		this.load(data);
+	if (typeof(data) == 'object'){
+		for (var key in data) {
+			if (data.hasOwnProperty(key)) {
+				if (key == 'layers') {
+					for (i = 0; i < data[key]; i++){
+						this.addLayer();
+					}
+				}
+				else if (key == 'mapdata') {
+					this.load(data[key]);
+				}
+				else{
+					this[key] = data[key];	
+				}
+				
+			}
+		}
+	}
 }
 
 Map.prototype.addLayer = function() {
@@ -19,14 +35,14 @@ Map.prototype.addLayer = function() {
 	return l;
 }
 
-Map.prototype.fill = function(tile, layer){
+Map.prototype.fill = function(layer, tile){
 	var l = layer || 0;
 
-	var t = this.layers[l].tiles.push(tile);
+	//var t = this.layers[l].tiles.push(tile);
 	
 	for(var x = 0; x < this.width; x++){
 		for(var y = 0; y < this.height; y++){
-			this.layers[l][x][y] = this.layers[l].tiles[t-1];
+			this.place(l, x, y, tile);
 		}
 	}
 }
@@ -45,26 +61,100 @@ Map.prototype.random = function(layer){
 }
 
 Map.prototype.save = function(){
-	return LZW.compress(JSON.stringify({
+	var s = {
 		width: this.width,
-		height: this.height,
-		layers: this.layers
-	}));
+		height: this.height
+	};
+
+	var l = new Array();
+	for (var i = 0; i < this.layers.length; i++){
+		l.push(new Array())
+		for (var x = 0; x < this.layers[i].length; x++){
+			l[i].push(new Array());
+			for (var y = 0; y < this.layers[i][x].length; y++){
+				l[i][x].push(new Array());
+
+				var tile = this.layers[i][x][y];
+				if (tile == null)
+					l[i][x][y] = null;
+				else
+					l[i][x][y] = [tile[0].name, tile[1]];
+			}
+		}
+	}
+	s.layers = l;
+
+	var json = JSON.stringify(s);
+
+	if (this.compressSave)
+		return LZW.compress(json);
+	else
+		return json;
+	
 }
 
 Map.prototype.load = function(string){
 	var data;
 	if(typeof(string) == 'string')
-		data = JSON.parse(LZW.decompress(JSON.parse("["+string+"]")));
+		if (this.compressSave)
+			data = JSON.parse(LZW.decompress(JSON.parse("["+string+"]")));
+		else
+			data = JSON.parse(string);
 	else
-		data = JSON.parse(LZW.decompress(string.data));
+		if (this.compressSave)
+			data = JSON.parse(LZW.decompress(string.data));
+		else
+			data = string.data;
 
 	this.width = data.width;
 	this.height = data.height;
-	this.layers = data.layers;
+
+	var l = new Array(data.layers.length);
+	for (var i = 0; i < l.length; i++){
+		l[i] = new Array(this.width);
+		for (var x = 0; x < this.width; x++){
+			l[i][x] = new Array(this.height);
+			for (var y = 0; y < this.height; y++){
+				
+
+				var tile = data.layers[i][x][y];
+				if (tile != null)
+					l[i][x][y] = [game.tileSet.layers[i][tile[0]], data.layers[i][x][y][1]];
+			}
+		}
+	}
+	this.layers = l;
+
 	this.loaded = true;
 }
 
+
+Map.prototype.place = function(layer, x ,y, tile){
+	var lref = [tile, {}];
+
+	if(!tile){
+		this.layers[layer][x][y] = null;
+		return;
+	}
+
+	if (tile.data){
+		if (tile.data.randomIndex){
+			lref[1].index = Math.floor(Math.random() * (tile.tiles.length ));
+		}
+	}
+
+	this.layers[layer][x][y] = lref;
+}
+
+
+
+Map.prototype.getHighestLayer = function(x, y){
+	var l = 0
+	for (var i = 0; i < this.layers.length; i++)
+		if (this.layers[i][x][y] != null)
+			l = i;
+	return l;
+}
 
 
 /*

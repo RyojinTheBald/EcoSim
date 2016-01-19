@@ -72,8 +72,29 @@ function Viewport (elm, config){
 
 
 			if (game.tileList.hasSelected){
-				if (game.tileList.hasSelected){
-					game.map.layers[game.tileList.layer][self.mouseOverTile.x -1][self.mouseOverTile.y -1] = game.tileList.selected;
+				var selectedTile = game.tileSet.layers[game.tileList.layer][game.tileList.selected];
+
+				var tilex = self.mouseOverTile.x -1;
+				var tiley = self.mouseOverTile.y -1;
+
+				var l = game.map.getHighestLayer(tilex, tiley);
+				var tile = game.map.layers[l][tilex][tiley] || null;
+
+				// increment index when clicking on selected tile when already placed
+				if(l >= 0 && tile[0].data.progressiveIndex && selectedTile.name == tile[0].name){
+					tile[1].index = mod((tile[1].index || 0) + 1, tile[0].tiles.length);
+				}
+				else{
+					if(game.map.layers[0][tilex][tiley][0].data.buildable){
+						if(selectedTile.data.buildOn){
+							if(game.map.layers[0][tilex][tiley][0].name == selectedTile.data.buildOn){
+								game.map.place(game.tileList.layer, tilex, tiley, selectedTile);
+							}
+						}
+						else{
+							game.map.place(game.tileList.layer, tilex, tiley, selectedTile);
+						}
+					}
 				}
 			}
 		}
@@ -201,24 +222,41 @@ Viewport.prototype.draw = function(map, tileSet){
 
 	this.context.drawImage(this.bg, 0, 0, this.w, this.h);
 
+	// Loop over x coordinates, y coordiantes, and layers
 	for (var x = mapx; x <= mapx2; x++){
 		for (var y = mapy; y <= mapy2; y++){
 			for (var i = 0; i < map.layers.length; i++){
 				if (x < map.width && y < map.height){
-					var tile = map.layers[i][x][y];
-					if (tile != null ){
-						if(typeof(tileSet.layers[i][tile]) != 'undefined'){
-							tileSet.layers[i][tile].draw(
-								this.context,
-								Math.floor((x * this.tileSize) - this.x), 
-								Math.floor((y * this.tileSize) - this.y),
-								this.tileSize);
-						}
-						else
-						{
-							//console.log('Tile error', tile, tileSet.layers[i]);
-						}
-					}
+
+
+
+		var tile = map.layers[i][x][y];
+		if (tile != null ){
+			if(typeof(tile) != 'undefined'){
+
+				if (tile[0].draw){
+					tile[0].draw(
+						this.context,
+						Math.floor((x * this.tileSize) - this.x), 
+						Math.floor((y * this.tileSize) - this.y),
+						this.tileSize, tile[1]);
+				}
+				else{
+					console.log('Tile error', tile, tileSet.layers[i]);
+				game.animating = false;
+				return;
+				}
+			}
+			else
+			{
+				console.log('Tile error', tile, tileSet.layers[i]);
+				game.animating = false;
+				return;
+			}
+		}
+
+
+
 				}					
 			}
 		}

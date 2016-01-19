@@ -6,7 +6,8 @@ requirejs.config({
 	}
 });
 
-requirejs(["Tiles", "Map", "point", "helpers", "Viewport", "TileList", "InfoWindow", "Entity", "BuildLayer", "../lib/lzw"], function() { game.onLoad(); });
+requirejs(["Tiles", "Map", "point", "helpers", "Viewport", "TileList", "InfoWindow", 
+	"Entity", "BuildLayer", "../lib/lzw"], function() { game.onLoad(); });
 
 /*
  *	Main class definition
@@ -38,9 +39,14 @@ game.onLoad = function() {
 
 	// Load map from file
 	requirejs(['../maps/map1'], function(m) {
-		game.map = new Map(m);
-		game.buildLayer = new BuildLayer(game.map);
+		//game.map = new Map(m);
+		//game.buildLayer = new BuildLayer(game.map);
 
+		game.map = new Map({width: 40, height: 40, layers: 3});
+
+		game.map.fill(0, game.tileSet.layers[0]['Grass']);
+
+		console.log("Game object", game);
 
 		//Start main loop
 		game.animLoop();
@@ -52,23 +58,21 @@ game.onLoad = function() {
  *	Main loop
  */
 game.animLoop = function(){
+	if (game.tileSet.loaded && game.map.loaded && game.animating){
+		if (game.animating !== true)
+			game.animating --;
+
+		game.viewport.draw(game.map, game.tileSet);
+		game.tileList.draw(game.tileSet);
+
+	}
 	if (game.animating)
 		requestAnimFrame(game.animLoop);
 	else
 		window.setTimeout(game.animLoop, 1000 / 10);
 
-	if (game.tileSet.loaded && game.map.loaded && game.animating){
-		game.viewport.draw(game.map, game.tileSet);
-		game.tileList.draw(game.tileSet);
-	}
 }
 
 game.status = function(text){
 	document.getElementById('status').innerHTML = text;
 }
-
-
-
-
-
-
